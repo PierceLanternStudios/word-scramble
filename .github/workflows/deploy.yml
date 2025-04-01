@@ -4,25 +4,34 @@ on:
   push:
     branches:
       - main
+      - master
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          # TODO: replace with latest, it was causing some Yarn checksum issues recently though
+          node-version: 23
+          cache: yarn
+          cache-dependency-path: ./yarn.lock
 
       - name: Install dependencies
-        run: npm install
+        run: yarn --immutable
+        shell: bash
 
-      - name: Build project
-        run: npm run build
+      - name: Build app
+        run: yarn build
+
+        env:
+          NODE_ENV: production
+          PUBLIC_URL: /react-word-scramble/
 
       - name: Set up Pages
         uses: actions/configure-pages@v5
