@@ -15,7 +15,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    #if: github.repository == 'piercelanternstudios/react-word-scramble'
+    if: github.repository == 'piercelanternstudios/react-word-scramble'
 
     environment:
       name: build-and-deploy
@@ -42,7 +42,7 @@ jobs:
 
         env:
           NODE_ENV: production
-          PUBLIC_URL: /word-scramble/
+          PUBLIC_URL: ${{ steps.deployment.outputs.page_url }} #/word-scramble/
 
       - name: Set up Pages
         uses: actions/configure-pages@v5
