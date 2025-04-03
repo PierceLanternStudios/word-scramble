@@ -1,3 +1,5 @@
+import { normalizeString } from "./Normalization";
+
 export type State =
   | { phase: "pre-game"; wordPack: readonly string[] | null }
   | {
@@ -41,7 +43,7 @@ export function reducer(state: State, action: Action): State {
     case "update-guess":
       if (state.phase !== "in-game") return state;
 
-      if (state.goal === action.newGuess)
+      if (state.goal === normalizeString(action.newGuess))
         return {
           phase: "post-game",
           goal: state.goal,
