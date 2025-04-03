@@ -59,6 +59,11 @@ function App() {
               }
             />
           </label>
+          <div>
+            <button onClick={() => dispatch({ type: "end-game" })}>
+              End Game
+            </button>
+          </div>
           <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
@@ -66,7 +71,7 @@ function App() {
       return (
         <div>
           <h3>Nice Job!</h3>
-          <div>You guessed "{state.goal}"!</div>
+          <div>The last word was "{state.goal}"!</div>
           <button onClick={() => dispatch({ type: "start-game" })}>
             Start a new Game!
           </button>

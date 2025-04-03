@@ -13,7 +13,8 @@ export type State =
 export type Action =
   | { type: "load-data"; wordPack: readonly string[] }
   | { type: "start-game" }
-  | { type: "update-guess"; newGuess: string };
+  | { type: "update-guess"; newGuess: string }
+  | { type: "end-game" };
 
 // ######################################################################
 // ==================    State Reducer      =============================
@@ -45,12 +46,20 @@ export function reducer(state: State, action: Action): State {
 
       if (state.goal === normalizeString(action.newGuess))
         return {
+          phase: "in-game",
+          goal: getRandomWord(state),
+          guess: "",
+          wordPack: state.wordPack,
+        };
+      return { ...state, guess: action.newGuess };
+
+    case "end-game":
+      if (state.phase === "in-game")
+        return {
           phase: "post-game",
           goal: state.goal,
           wordPack: state.wordPack,
         };
-
-      return { ...state, guess: action.newGuess };
   }
   return state;
 }
