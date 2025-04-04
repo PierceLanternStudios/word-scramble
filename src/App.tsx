@@ -48,7 +48,7 @@ function App() {
       return (
         <div>
           <h3>In Game!</h3>
-          <div>Goal: {state.goal}</div>
+          <div>Goal: {state.shuffledGoal}</div>
           <label>
             Guess:{" "}
             <input
