@@ -1,55 +1,7 @@
 import React from "react";
 import "./App.css";
-import { JsxAttribute, Statement } from "typescript";
-import { json } from "stream/consumers";
-
-type State =
-  | { phase: "Pre-Game" }
-  | { phase: "In-Game"; goal: string; guess: string }
-  | { phase: "Post-Game"; goal: string };
-
-type Action =
-  | { type: "start-game" }
-  | { type: "update-guess"; newGuess: string };
-
-// ######################################################################
-// ==================    State Reducer      =============================
-// ######################################################################
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case "start-game":
-      return { phase: "In-Game", goal: getRandomWord(), guess: "" };
-
-    case "update-guess":
-      if (state.phase !== "In-Game") return state;
-
-      if (state.goal === action.newGuess)
-        return { phase: "Post-Game", goal: state.goal };
-
-      return { ...state, guess: action.newGuess };
-  }
-  return state;
-}
-// ######################################################################
-// ==================     Utilities      ================================
-// ######################################################################
-
-function getRandomWord(): string {
-  const RANDOMWORDS = [
-    "llama",
-    "tiger",
-    "wildebeest",
-    "aardvark",
-    "puma",
-    "spotted-turtle",
-  ];
-  return RANDOMWORDS[Math.floor(Math.random() * RANDOMWORDS.length)];
-}
-
-function getInitialState(): State {
-  return { phase: "Pre-Game" };
-}
+import { type State, type Action } from "./useAppState";
+import { reducer, getInitialState } from "./useAppState";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -58,23 +10,45 @@ function getInitialState(): State {
 function App() {
   const [state, dispatch] = React.useReducer(reducer, null, getInitialState);
 
+  // get word pack:
+  React.useEffect(() => {
+    fetch(process.env.PUBLIC_URL + "/animals.txt")
+      .then((response) => response.text())
+      .then((text) => {
+        setTimeout(() => {
+          dispatch({
+            type: "load-data",
+            wordPack: text
+              .split("\n")
+              .map((word) => word.toUpperCase().trim())
+              .filter(Boolean),
+          });
+        }, 1000);
+      });
+  }, [dispatch]);
+
+  // switch on game phase to decide what to render:
   switch (state.phase) {
-    case "Pre-Game":
+    case "pre-game":
       return (
         <div>
           <h3>Pre Game!</h3>
-          <button onClick={() => dispatch({ type: "start-game" })}>
-            Start Game!
-          </button>
+          {state.wordPack === null ? (
+            "Loading words..."
+          ) : (
+            <button onClick={() => dispatch({ type: "start-game" })}>
+              Start Game!
+            </button>
+          )}
           <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
 
-    case "In-Game":
+    case "in-game":
       return (
         <div>
           <h3>In Game!</h3>
-          <div>Goal: {state.goal}</div>
+          <div>Goal: {state.shuffledGoal}</div>
           <label>
             Guess:{" "}
             <input
@@ -85,14 +59,19 @@ function App() {
               }
             />
           </label>
+          <div>
+            <button onClick={() => dispatch({ type: "end-game" })}>
+              End Game
+            </button>
+          </div>
           <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
-    case "Post-Game":
+    case "post-game":
       return (
         <div>
           <h3>Nice Job!</h3>
-          <div>You guessed "{state.goal}"!</div>
+          <div>The last word was "{state.goal}"!</div>
           <button onClick={() => dispatch({ type: "start-game" })}>
             Start a new Game!
           </button>
