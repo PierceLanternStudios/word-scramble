@@ -57,24 +57,25 @@ function App() {
         <div className={InGameCSS.container}>
           <h3>In Game!</h3>
           <div>Goal: {state.wordScrambled}</div>
-          <label>
-            Guess:{" "}
-            <input
-              type="text"
-              className={InGameCSS.inputField}
-              autoFocus
-              ref={guessInputRef}
-              value={state.guess}
-              onChange={(ev) =>
-                dispatch({ type: "update-guess", newGuess: ev.target.value })
-              }
-            />
-          </label>
-          <div>
-            <button onClick={() => dispatch({ type: "end-game" })}>
+          <input
+            type="text"
+            className={InGameCSS.inputField}
+            autoFocus
+            ref={guessInputRef}
+            value={state.guess}
+            onChange={(ev) =>
+              dispatch({ type: "update-guess", newGuess: ev.target.value })
+            }
+          />
+          <div className={InGameCSS.rowContainer}>
+            <button
+              className={ButtonCSS.button}
+              onClick={() => dispatch({ type: "end-game" })}
+            >
               End Game
             </button>
             <button
+              className={ButtonCSS.button}
               onClick={() => {
                 dispatch({ type: "skip-word" });
                 guessInputRef.current?.focus();
@@ -87,7 +88,7 @@ function App() {
       );
     case "post-game":
       return (
-        <div>
+        <div className={InGameCSS.container}>
           <h3>Nice Job!</h3>
           <div>The last word was "{state.wordUnscrambled}"!</div>
           <span>
@@ -95,7 +96,11 @@ function App() {
             <strong>{state.history.skips} skips!</strong>
           </span>
           <div>
-            <button autoFocus onClick={() => dispatch({ type: "start-game" })}>
+            <button
+              autoFocus
+              className={ButtonCSS.button}
+              onClick={() => dispatch({ type: "start-game" })}
+            >
               Start a new Game!
             </button>
           </div>
