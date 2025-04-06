@@ -2,6 +2,8 @@ import React from "react";
 import "./App.css";
 import { reducer, getInitialState } from "./useAppState";
 import { normalizeString } from "./Normalization";
+import { isBindingName } from "typescript";
+import InGameCSS from "./InGame.module.css";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -9,6 +11,7 @@ import { normalizeString } from "./Normalization";
 
 function App() {
   const [state, dispatch] = React.useReducer(reducer, null, getInitialState);
+  const guessInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // get word pack:
   React.useEffect(() => {
@@ -36,7 +39,7 @@ function App() {
           {state.wordPack === null ? (
             "Loading words..."
           ) : (
-            <button onClick={() => dispatch({ type: "start-game" })}>
+            <button autoFocus onClick={() => dispatch({ type: "start-game" })}>
               Start Game!
             </button>
           )}
@@ -53,6 +56,9 @@ function App() {
             Guess:{" "}
             <input
               type="text"
+              className={InGameCSS.inputField}
+              autoFocus
+              ref={guessInputRef}
               value={state.guess}
               onChange={(ev) =>
                 dispatch({ type: "update-guess", newGuess: ev.target.value })
@@ -63,7 +69,12 @@ function App() {
             <button onClick={() => dispatch({ type: "end-game" })}>
               End Game
             </button>
-            <button onClick={() => dispatch({ type: "skip-word" })}>
+            <button
+              onClick={() => {
+                dispatch({ type: "skip-word" });
+                guessInputRef.current?.focus();
+              }}
+            >
               Skip this word
             </button>
           </div>
