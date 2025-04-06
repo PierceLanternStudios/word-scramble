@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
-import { type State, type Action } from "./useAppState";
 import { reducer, getInitialState } from "./useAppState";
+import { normalizeString } from "./Normalization";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -20,7 +20,7 @@ function App() {
             type: "load-data",
             wordPack: text
               .split("\n")
-              .map((word) => word.toUpperCase().trim())
+              .map((word) => normalizeString(word))
               .filter(Boolean),
           });
         }, 1000);

@@ -56,7 +56,7 @@ export function reducer(state: State, action: Action): State {
       break;
 
     // Action: Load data
-    // called whenever the game starts to load a word pack.
+    // called when the game has loaded a wordpack and can update state.
     case "load-data": {
       if (state.phase === "pre-game") {
         return { ...state, wordPack: action.wordPack };
