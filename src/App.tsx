@@ -6,6 +6,7 @@ import { isBindingName } from "typescript";
 import InGameCSS from "./InGame.module.css";
 import PreGameCSS from "./PreGame.module.css";
 import ButtonCSS from "./Button.module.css";
+import { pluralize } from "./Utilities";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -23,10 +24,7 @@ function App() {
         setTimeout(() => {
           dispatch({
             type: "load-data",
-            wordPack: text
-              .split("\n")
-              .map((word) => normalizeString(word))
-              .filter(Boolean),
+            wordPack: text.split("\n").map(normalizeString).filter(Boolean),
           });
         }, 1000);
       });
@@ -92,8 +90,9 @@ function App() {
           <h3>Nice Job!</h3>
           <div>The last word was "{state.wordUnscrambled}"!</div>
           <span>
-            Stats: You had <strong>{state.history.guesses} guesses</strong> and{" "}
-            <strong>{state.history.skips} skips!</strong>
+            Stats: You had{" "}
+            <strong>{pluralize("guess", state.history.guesses)}</strong> and{" "}
+            <strong>{pluralize("skip", state.history.skips)}!</strong>
           </span>
           <div>
             <button
