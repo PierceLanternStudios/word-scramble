@@ -48,7 +48,7 @@ function App() {
       return (
         <div>
           <h3>In Game!</h3>
-          <div>Goal: {state.shuffledGoal}</div>
+          <div>Goal: {state.wordScrambled}</div>
           <label>
             Guess:{" "}
             <input
@@ -63,6 +63,9 @@ function App() {
             <button onClick={() => dispatch({ type: "end-game" })}>
               End Game
             </button>
+            <button onClick={() => dispatch({ type: "skip-word" })}>
+              Skip this word
+            </button>
           </div>
           <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
@@ -71,10 +74,16 @@ function App() {
       return (
         <div>
           <h3>Nice Job!</h3>
-          <div>The last word was "{state.goal}"!</div>
-          <button onClick={() => dispatch({ type: "start-game" })}>
-            Start a new Game!
-          </button>
+          <div>The last word was "{state.wordUnscrambled}"!</div>
+          <span>
+            Stats: You had <strong>{state.history.guesses} guesses</strong> and{" "}
+            <strong>{state.history.skips} skips!</strong>
+          </span>
+          <div>
+            <button onClick={() => dispatch({ type: "start-game" })}>
+              Start a new Game!
+            </button>
+          </div>
           <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
