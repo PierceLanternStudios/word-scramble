@@ -43,7 +43,7 @@ export function reducer(state: State, action: Action): State {
     // has been loaded)
     case "start-game":
       if (state.wordPack !== null) {
-        const word = getRandomWord(state);
+        const word = getRandomWord(state.wordPack);
         return {
           phase: "in-game",
           wordUnscrambled: word,
@@ -71,7 +71,7 @@ export function reducer(state: State, action: Action): State {
 
       // only occurs if the word is guessed correctly:
       if (state.wordUnscrambled === normalizeString(action.newGuess)) {
-        const word = getRandomWord(state);
+        const word = getRandomWord(state.wordPack);
         return {
           phase: "in-game",
           wordUnscrambled: word,
@@ -108,7 +108,7 @@ export function reducer(state: State, action: Action): State {
     // called if the player wants to skip a word:
     case "skip-word": {
       if (state.phase !== "in-game") break;
-      const word = getRandomWord(state);
+      const word = getRandomWord(state.wordPack);
       return {
         phase: "in-game",
         wordUnscrambled: word,
@@ -138,8 +138,7 @@ export function getInitialState(): State {
   return { phase: "pre-game", wordPack: null };
 }
 
-// picks a random word from the word pack. Assumes that the wordPack is
-// initialized and not null.
-function getRandomWord(state: State): string {
-  return state.wordPack![Math.floor(Math.random() * state.wordPack!.length)];
+// picks a random word from the word pack.
+function getRandomWord(wordPack: readonly string[]): string {
+  return wordPack![Math.floor(Math.random() * wordPack!.length)];
 }
