@@ -91,7 +91,7 @@ function App() {
             <strong>{state.history.skips} skips!</strong>
           </span>
           <div>
-            <button onClick={() => dispatch({ type: "start-game" })}>
+            <button autoFocus onClick={() => dispatch({ type: "start-game" })}>
               Start a new Game!
             </button>
           </div>
