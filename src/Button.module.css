@@ -1,0 +1,36 @@
+.button {
+  padding: 20px 40px;
+  font-size: larger;
+  background-color: rgb(197, 197, 197);
+  border-radius: 10px;
+  border: 1px;
+  border-style: solid;
+  border-color: rgb(117, 117, 117);
+  transition-duration: 0.25s;
+}
+
+.button:hover,
+button:focus {
+  scale: 1.1;
+}
+
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(1.5deg);
+  }
+  40% {
+    transform: rotate(-1.5deg);
+  }
+  60% {
+    transform: rotate(1.5deg);
+  }
+  80% {
+    transform: rotate(-1.5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}

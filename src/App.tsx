@@ -4,6 +4,8 @@ import { reducer, getInitialState } from "./useAppState";
 import { normalizeString } from "./Normalization";
 import { isBindingName } from "typescript";
 import InGameCSS from "./InGame.module.css";
+import PreGameCSS from "./PreGame.module.css";
+import ButtonCSS from "./Button.module.css";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -34,22 +36,25 @@ function App() {
   switch (state.phase) {
     case "pre-game":
       return (
-        <div>
-          <h3>Pre Game!</h3>
+        <div className={PreGameCSS.container}>
+          <h3>Welcome to Word Scramble!</h3>
           {state.wordPack === null ? (
             "Loading words..."
           ) : (
-            <button autoFocus onClick={() => dispatch({ type: "start-game" })}>
+            <button
+              autoFocus
+              className={ButtonCSS.button}
+              onClick={() => dispatch({ type: "start-game" })}
+            >
               Start Game!
             </button>
           )}
-          <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
 
     case "in-game":
       return (
-        <div>
+        <div className={InGameCSS.container}>
           <h3>In Game!</h3>
           <div>Goal: {state.wordScrambled}</div>
           <label>
@@ -78,7 +83,6 @@ function App() {
               Skip this word
             </button>
           </div>
-          <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
     case "post-game":
@@ -95,7 +99,6 @@ function App() {
               Start a new Game!
             </button>
           </div>
-          <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
   }
