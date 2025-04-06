@@ -11,6 +11,13 @@ import { isTemplateExpression } from "typescript";
  * Effects:     This will preserve the input data.
  */
 export function shuffleWord(word: string): string {
+  return word
+    .split(/([ -])/)
+    .map(shuffleSingleWord)
+    .join("");
+}
+
+function shuffleSingleWord(word: string): string {
   const copyWord: string[] = word.split("");
   let result: string = "";
   for (let last = copyWord.length - 1; last >= 0; last--) {
