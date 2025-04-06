@@ -109,7 +109,7 @@ export function getInitialState(): State {
 
 // picks a random word from the word pack.
 function getRandomWord(wordPack: readonly string[]): string {
-  return wordPack![Math.floor(Math.random() * wordPack!.length)];
+  return wordPack[Math.floor(Math.random() * wordPack!.length)];
 }
 
 // function to generate a new game-state object, called after a word was
