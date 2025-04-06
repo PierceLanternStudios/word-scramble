@@ -1,3 +1,5 @@
+import { isTemplateExpression } from "typescript";
+
 /**
  * Name:        shuffleWord
  * Description: Takes a string, and returns a randomly shuffled
@@ -14,7 +16,9 @@ export function shuffleWord(word: string): string {
   for (let last = copyWord.length - 1; last >= 0; last--) {
     const idx = Math.floor(Math.random() * copyWord.length);
     result += copyWord[idx];
-    [copyWord[idx], copyWord[last]] = [copyWord[last], copyWord[idx]];
+    const temp = copyWord[last];
+    copyWord[last] = copyWord[idx];
+    copyWord[idx] = temp;
     copyWord.pop();
   }
 
