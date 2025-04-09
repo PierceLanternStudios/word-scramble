@@ -1,4 +1,17 @@
-import { isTemplateExpression } from "typescript";
+export function getNewWord(
+  previous: string,
+  wordPack: readonly string[],
+  bannedWords: Set<string>
+): { wordScrambled: string; wordUnscrambled: string } {
+  let shuffledWord: string | null;
+  let word: string;
+  do {
+    word = getRandomWord(wordPack, previous);
+    shuffledWord = shuffleWord(word, bannedWords);
+  } while (shuffledWord === null);
+
+  return { wordScrambled: word, wordUnscrambled: shuffledWord };
+}
 
 /**
  * Name:        shuffleWord
@@ -10,11 +23,24 @@ import { isTemplateExpression } from "typescript";
  *              in a randomized order.
  * Effects:     This will preserve the input data.
  */
-export function shuffleWord(word: string): string {
-  return word
+export function shuffleWord(
+  word: string,
+  bannedWords: Set<string>
+): string | null {
+  let shuffledWord = word
     .split(/([ -])/)
     .map(shuffleSingleWord)
     .join("");
+
+  let attempt = 0;
+  while (isWordNaughty(shuffledWord, bannedWords) && attempt < 10) {
+    shuffledWord = word
+      .split(/([ -])/)
+      .map(shuffleSingleWord)
+      .join("");
+    attempt++;
+  }
+  return attempt === 10 ? null : shuffledWord;
 }
 
 function arraySwapWithLast(array: string[], idx: number): string[] {
@@ -35,4 +61,36 @@ function shuffleSingleWord(word: string): string {
     copyWord.pop();
   }
   return result;
+}
+
+// function to return if any of the substrings of a word are naughty. If so,
+// this function will return true. If not, this returns false.
+function isWordNaughty(
+  shuffledWord: string,
+  bannedWords: Set<string>
+): boolean {
+  return (
+    shuffledWord
+      .split("")
+      .flatMap((_, i) =>
+        shuffledWord
+          .slice(i)
+          .split("")
+          .map((_, j) => shuffledWord.slice(i, i + j + 1))
+      )
+      .filter((elem) => bannedWords.has(elem)).length > 0
+  );
+}
+
+// picks a random word from the word pack. Guarantees that the previous word
+// will not be chosen again.
+function getRandomWord(
+  wordPack: readonly string[],
+  previous: string = ""
+): string {
+  let newWord: string;
+  do {
+    newWord = wordPack[Math.floor(Math.random() * wordPack.length)];
+  } while (newWord === previous);
+  return newWord;
 }

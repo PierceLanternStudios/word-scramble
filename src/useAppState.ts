@@ -1,5 +1,5 @@
 import { normalizeString } from "./Normalization";
-import { shuffleWord } from "./Shuffler";
+import { getNewWord, shuffleWord } from "./Shuffler";
 
 export type WordHistoryItem = {
   wordUnscrambled: string;
@@ -58,11 +58,11 @@ export function reducer(state: State, action: Action): State {
     // has been loaded)
     case "start-game":
       if (state.wordPack !== null && state.bannedWords !== null) {
-        const word = getRandomWord(state.wordPack);
+        const wordData = getNewWord("", state.wordPack, state.bannedWords);
         return {
           phase: "in-game",
-          wordUnscrambled: word,
-          wordScrambled: shuffleWord(word),
+          wordUnscrambled: wordData.wordUnscrambled,
+          wordScrambled: wordData.wordScrambled,
           history: { words: [], skips: 0, guesses: 0 },
           wordPack: state.wordPack,
           bannedWords: state.bannedWords,
@@ -125,30 +125,20 @@ export function getInitialState(): State {
   return { phase: "pre-game", wordPack: null, bannedWords: null };
 }
 
-// picks a random word from the word pack. Guarantees that the previous word
-// will not be chosen again.
-function getRandomWord(
-  wordPack: readonly string[],
-  previous: string = ""
-): string {
-  let newWord = wordPack[Math.floor(Math.random() * wordPack.length)];
-  while (newWord === previous) {
-    console.log(newWord);
-    newWord = wordPack[Math.floor(Math.random() * wordPack.length)];
-  }
-  return newWord;
-}
-
 // function to generate a new game-state object, called after a word was
 // either guessed correctly or skipped
 function generateNewGameState(state: State, wasGuessed: boolean): State {
   if (state.phase !== "in-game") return state;
 
-  const word = getRandomWord(state.wordPack, state.wordUnscrambled);
+  const newWordData = getNewWord(
+    state.wordUnscrambled,
+    state.wordPack,
+    state.bannedWords
+  );
   return {
     phase: "in-game",
-    wordUnscrambled: word,
-    wordScrambled: shuffleWord(word),
+    wordUnscrambled: newWordData.wordUnscrambled,
+    wordScrambled: newWordData.wordScrambled,
     guess: "",
     history: {
       words: [
