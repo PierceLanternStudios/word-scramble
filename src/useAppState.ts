@@ -107,9 +107,18 @@ export function getInitialState(): State {
   return { phase: "pre-game", wordPack: null };
 }
 
-// picks a random word from the word pack.
-function getRandomWord(wordPack: readonly string[]): string {
-  return wordPack[Math.floor(Math.random() * wordPack!.length)];
+// picks a random word from the word pack. Guarantees that the previous word
+// will not be chosen again.
+function getRandomWord(
+  wordPack: readonly string[],
+  previous: string = ""
+): string {
+  let newWord = wordPack[Math.floor(Math.random() * wordPack.length)];
+  while (newWord === previous) {
+    console.log(newWord);
+    newWord = wordPack[Math.floor(Math.random() * wordPack.length)];
+  }
+  return newWord;
 }
 
 // function to generate a new game-state object, called after a word was
@@ -117,7 +126,7 @@ function getRandomWord(wordPack: readonly string[]): string {
 function generateNewGameState(state: State, wasGuessed: boolean): State {
   if (state.phase !== "in-game") return state;
 
-  const word = getRandomWord(state.wordPack);
+  const word = getRandomWord(state.wordPack, state.wordUnscrambled);
   return {
     phase: "in-game",
     wordUnscrambled: word,
