@@ -1,5 +1,5 @@
 import { normalizeString } from "./Normalization";
-import { getNewWord, shuffleWord } from "./Shuffler";
+import { getNewWord } from "./Shuffler";
 
 export type WordHistoryItem = {
   wordUnscrambled: string;
@@ -58,7 +58,7 @@ export function reducer(state: State, action: Action): State {
     // has been loaded)
     case "start-game":
       if (state.wordPack !== null && state.bannedWords !== null) {
-        const wordData = getNewWord("", state.wordPack, state.bannedWords);
+        const wordData = getNewWord(state.wordPack, state.bannedWords);
         return {
           phase: "in-game",
           wordUnscrambled: wordData.wordUnscrambled,
