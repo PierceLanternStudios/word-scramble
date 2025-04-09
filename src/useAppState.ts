@@ -1,7 +1,7 @@
 import { normalizeString } from "./Normalization";
 import { shuffleWord } from "./Shuffler";
 
-export type WordHistory = {
+export type WordHistoryItem = {
   wordUnscrambled: string;
   wordScrambled: string;
   result: "guessed" | "skipped";
@@ -15,12 +15,20 @@ export type State =
       wordScrambled: string;
       guess: string;
       wordPack: readonly string[];
-      history: { words: WordHistory[]; guesses: number; skips: number };
+      history: {
+        words: readonly WordHistoryItem[];
+        guesses: number;
+        skips: number;
+      };
     }
   | {
       phase: "post-game";
       wordUnscrambled: string;
-      history: { words: WordHistory[]; guesses: number; skips: number };
+      history: {
+        words: readonly WordHistoryItem[];
+        guesses: number;
+        skips: number;
+      };
       wordPack: readonly string[];
     };
 
@@ -71,26 +79,7 @@ export function reducer(state: State, action: Action): State {
 
       // only occurs if the word is guessed correctly:
       if (state.wordUnscrambled === normalizeString(action.newGuess)) {
-        const word = getRandomWord(state.wordPack);
-        return {
-          phase: "in-game",
-          wordUnscrambled: word,
-          wordScrambled: shuffleWord(word),
-          guess: "",
-          history: {
-            words: [
-              ...state.history.words,
-              {
-                wordUnscrambled: state.wordUnscrambled,
-                wordScrambled: state.wordScrambled,
-                result: "guessed",
-              },
-            ],
-            guesses: state.history.guesses + 1,
-            skips: state.history.skips,
-          },
-          wordPack: state.wordPack,
-        };
+        return generateNewGameState(state, true);
       }
       return { ...state, guess: action.newGuess };
 
@@ -107,27 +96,7 @@ export function reducer(state: State, action: Action): State {
 
     // called if the player wants to skip a word:
     case "skip-word": {
-      if (state.phase !== "in-game") break;
-      const word = getRandomWord(state.wordPack);
-      return {
-        phase: "in-game",
-        wordUnscrambled: word,
-        wordScrambled: shuffleWord(word),
-        guess: "",
-        history: {
-          words: [
-            ...state.history.words,
-            {
-              wordUnscrambled: state.wordUnscrambled,
-              wordScrambled: state.wordScrambled,
-              result: "skipped",
-            },
-          ],
-          guesses: state.history.guesses,
-          skips: state.history.skips + 1,
-        },
-        wordPack: state.wordPack,
-      };
+      return generateNewGameState(state, false);
     }
   }
   return state;
@@ -140,5 +109,32 @@ export function getInitialState(): State {
 
 // picks a random word from the word pack.
 function getRandomWord(wordPack: readonly string[]): string {
-  return wordPack![Math.floor(Math.random() * wordPack!.length)];
+  return wordPack[Math.floor(Math.random() * wordPack!.length)];
+}
+
+// function to generate a new game-state object, called after a word was
+// either guessed correctly or skipped
+function generateNewGameState(state: State, wasGuessed: boolean): State {
+  if (state.phase !== "in-game") return state;
+
+  const word = getRandomWord(state.wordPack);
+  return {
+    phase: "in-game",
+    wordUnscrambled: word,
+    wordScrambled: shuffleWord(word),
+    guess: "",
+    history: {
+      words: [
+        ...state.history.words,
+        {
+          wordUnscrambled: state.wordUnscrambled,
+          wordScrambled: state.wordScrambled,
+          result: "skipped",
+        },
+      ],
+      guesses: wasGuessed ? state.history.guesses + 1 : state.history.guesses,
+      skips: wasGuessed ? state.history.skips : state.history.skips + 1,
+    },
+    wordPack: state.wordPack,
+  };
 }

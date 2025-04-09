@@ -2,6 +2,11 @@ import React from "react";
 import "./App.css";
 import { reducer, getInitialState } from "./useAppState";
 import { normalizeString } from "./Normalization";
+import { isBindingName } from "typescript";
+import InGameCSS from "./InGame.module.css";
+import PreGameCSS from "./PreGame.module.css";
+import ButtonCSS from "./Button.module.css";
+import { pluralize } from "./Utilities";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -9,6 +14,7 @@ import { normalizeString } from "./Normalization";
 
 function App() {
   const [state, dispatch] = React.useReducer(reducer, null, getInitialState);
+  const guessInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // get word pack:
   React.useEffect(() => {
@@ -18,10 +24,7 @@ function App() {
         setTimeout(() => {
           dispatch({
             type: "load-data",
-            wordPack: text
-              .split("\n")
-              .map((word) => normalizeString(word))
-              .filter(Boolean),
+            wordPack: text.split("\n").map(normalizeString).filter(Boolean),
           });
         }, 1000);
       });
@@ -31,60 +34,75 @@ function App() {
   switch (state.phase) {
     case "pre-game":
       return (
-        <div>
-          <h3>Pre Game!</h3>
+        <div className={PreGameCSS.container}>
+          <h3>Welcome to Word Scramble!</h3>
           {state.wordPack === null ? (
             "Loading words..."
           ) : (
-            <button onClick={() => dispatch({ type: "start-game" })}>
+            <button
+              autoFocus
+              className={ButtonCSS.button}
+              onClick={() => dispatch({ type: "start-game" })}
+            >
               Start Game!
             </button>
           )}
-          <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
 
     case "in-game":
       return (
-        <div>
+        <div className={InGameCSS.container}>
           <h3>In Game!</h3>
           <div>Goal: {state.wordScrambled}</div>
-          <label>
-            Guess:{" "}
-            <input
-              type="text"
-              value={state.guess}
-              onChange={(ev) =>
-                dispatch({ type: "update-guess", newGuess: ev.target.value })
-              }
-            />
-          </label>
-          <div>
-            <button onClick={() => dispatch({ type: "end-game" })}>
+          <input
+            type="text"
+            className={InGameCSS.inputField}
+            autoFocus
+            ref={guessInputRef}
+            value={state.guess}
+            onChange={(ev) =>
+              dispatch({ type: "update-guess", newGuess: ev.target.value })
+            }
+          />
+          <div className={InGameCSS.rowContainer}>
+            <button
+              className={ButtonCSS.button}
+              onClick={() => dispatch({ type: "end-game" })}
+            >
               End Game
             </button>
-            <button onClick={() => dispatch({ type: "skip-word" })}>
+            <button
+              className={ButtonCSS.button}
+              onClick={() => {
+                dispatch({ type: "skip-word" });
+                guessInputRef.current?.focus();
+              }}
+            >
               Skip this word
             </button>
           </div>
-          <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
     case "post-game":
       return (
-        <div>
+        <div className={InGameCSS.container}>
           <h3>Nice Job!</h3>
           <div>The last word was "{state.wordUnscrambled}"!</div>
           <span>
-            Stats: You had <strong>{state.history.guesses} guesses</strong> and{" "}
-            <strong>{state.history.skips} skips!</strong>
+            Stats: You had{" "}
+            <strong>{pluralize("guess", state.history.guesses)}</strong> and{" "}
+            <strong>{pluralize("skip", state.history.skips)}!</strong>
           </span>
           <div>
-            <button onClick={() => dispatch({ type: "start-game" })}>
+            <button
+              autoFocus
+              className={ButtonCSS.button}
+              onClick={() => dispatch({ type: "start-game" })}
+            >
               Start a new Game!
             </button>
           </div>
-          <pre>{JSON.stringify(state, null, 2)}</pre>
         </div>
       );
   }

@@ -1,0 +1,14 @@
+.button {
+  padding: 15px 10px;
+  background-color: rgb(197, 197, 197);
+  border-radius: 5px;
+  border: 1px;
+  border-style: solid;
+  border-color: rgb(117, 117, 117);
+  transition-duration: 0.25s;
+}
+
+.button:hover,
+button:focus {
+  scale: 1.1;
+}
