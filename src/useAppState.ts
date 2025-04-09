@@ -71,7 +71,10 @@ export function reducer(state: State, action: Action): State {
           wordScrambled: wordData.wordScrambled,
           history: { words: [], skips: 0, guesses: 0 },
           wordPack: cleanWords,
-          availableWordPack: wordData.availableWordPack,
+          availableWordPack:
+            wordData.availableWordPack.length === 0
+              ? state.wordPack.slice()
+              : wordData.availableWordPack,
           bannedWords: state.bannedWords,
           guess: "",
         };
