@@ -23,7 +23,11 @@ function App() {
         setTimeout(() => {
           dispatch({
             type: "load-data",
-            wordPack: text.split("\n").map(normalizeString).filter(Boolean),
+            wordPack: text
+              .split("\n")
+              .map(normalizeString)
+              .filter(Boolean)
+              .filter((elem, idx, self) => self.indexOf(elem) === idx),
           });
         }, 1000);
       });
