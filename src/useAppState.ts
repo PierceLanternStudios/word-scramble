@@ -1,7 +1,6 @@
 import { normalizeString } from "./Normalization";
 import { getNewWord } from "./Shuffler";
 import { isWordNaughty } from "./IsNaughty";
-import { quickRemove } from "./Utilities";
 
 export type WordHistoryItem = {
   wordUnscrambled: string;
