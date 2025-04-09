@@ -2,7 +2,6 @@ import React from "react";
 import "./App.css";
 import { reducer, getInitialState } from "./useAppState";
 import { normalizeString } from "./Normalization";
-import { isBindingName } from "typescript";
 import InGameCSS from "./InGame.module.css";
 import PreGameCSS from "./PreGame.module.css";
 import ButtonCSS from "./Button.module.css";

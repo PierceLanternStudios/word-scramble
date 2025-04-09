@@ -1,5 +1,5 @@
 import { normalizeString } from "./Normalization";
-import { getNewWord } from "./Shuffler";
+import { getNewWord, isWordNaughty } from "./Shuffler";
 
 export type WordHistoryItem = {
   wordUnscrambled: string;
@@ -64,7 +64,9 @@ export function reducer(state: State, action: Action): State {
           wordUnscrambled: wordData.wordUnscrambled,
           wordScrambled: wordData.wordScrambled,
           history: { words: [], skips: 0, guesses: 0 },
-          wordPack: state.wordPack,
+          wordPack: state.wordPack.filter(
+            (word) => !isWordNaughty(word, state.bannedWords!)
+          ),
           bannedWords: state.bannedWords,
           guess: "",
         };
@@ -131,9 +133,9 @@ function generateNewGameState(state: State, wasGuessed: boolean): State {
   if (state.phase !== "in-game") return state;
 
   const newWordData = getNewWord(
-    state.wordUnscrambled,
     state.wordPack,
-    state.bannedWords
+    state.bannedWords,
+    state.wordUnscrambled
   );
   return {
     phase: "in-game",

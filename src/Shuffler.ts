@@ -108,7 +108,7 @@ function shuffleSingleWord(word: string): string {
  * @returns               True if the word is found to be naughty, and false
  *                        otherwise.
  */
-function isWordNaughty(
+export function isWordNaughty(
   shuffledWord: string,
   bannedWords: Set<string>
 ): boolean {
