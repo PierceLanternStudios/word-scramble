@@ -2,7 +2,6 @@ import React from "react";
 import "./App.css";
 import { reducer, getInitialState } from "./useAppState";
 import { normalizeString } from "./Normalization";
-import { isBindingName } from "typescript";
 import InGameCSS from "./InGame.module.css";
 import PreGameCSS from "./PreGame.module.css";
 import ButtonCSS from "./Button.module.css";
@@ -18,17 +17,32 @@ function App() {
 
   // get word pack:
   React.useEffect(() => {
-    fetch(process.env.PUBLIC_URL + "/animals.txt")
+    fetch(process.env.PUBLIC_URL + "/birds.txt")
       .then((response) => response.text())
       .then((text) => {
         setTimeout(() => {
           dispatch({
             type: "load-data",
-            wordPack: text.split("\n").map(normalizeString).filter(Boolean),
+            wordPack: text
+              .split("\n")
+              .map(normalizeString)
+              .filter(Boolean)
+              .filter((elem, idx, self) => self.indexOf(elem) === idx),
           });
         }, 1000);
       });
-  }, [dispatch]);
+  }, []);
+
+  React.useEffect(() => {
+    fetch("https://unpkg.com/naughty-words@1.2.0/en.json").then((response) =>
+      response.json().then((bannedWords) =>
+        dispatch({
+          type: "load-bans",
+          bannedWords: bannedWords.map(normalizeString).filter(Boolean),
+        })
+      )
+    );
+  }, []);
 
   // switch on game phase to decide what to render:
   switch (state.phase) {
@@ -36,7 +50,7 @@ function App() {
       return (
         <div className={PreGameCSS.container}>
           <h3>Welcome to Word Scramble!</h3>
-          {state.wordPack === null ? (
+          {state.wordPack === null || state.bannedWords === null ? (
             "Loading words..."
           ) : (
             <button
