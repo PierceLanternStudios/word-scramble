@@ -12,6 +12,19 @@ export function pluralize(input: string, occurences: number) {
 }
 
 /**
+ * tryRemoveElement
+ * @param array  An array of strings to try to remove an item from
+ * @param elem   An element to try and remove from the array. Assumes no
+ *               duplicate words in the array.
+ * @returns      An array with the specified element removed, or the original array
+ *               if the input is not found.
+ */
+export function tryRemoveElement(array: string[], elem: string): string[] {
+  array = quickRemove(array, array.indexOf(elem));
+  return array;
+}
+
+/**
  * quickRemove
  * @param array  An array of strings to quickly remove an item from
  * @param idx    An index in the array to remove the item from. If this index

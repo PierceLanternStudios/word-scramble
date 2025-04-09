@@ -1,5 +1,5 @@
 import { isWordNaughty } from "./IsNaughty";
-import { quickRemove } from "./Utilities";
+import { quickRemove, tryRemoveElement } from "./Utilities";
 
 /**
  *  getNewWord
@@ -20,7 +20,7 @@ import { quickRemove } from "./Utilities";
  *                      new word.
  */
 export function getNewWord(
-  wordPack: string[],
+  wordPack: readonly string[],
   bannedWords: Set<string>,
   previous: string = ""
 ): {
@@ -30,18 +30,14 @@ export function getNewWord(
 } {
   let shuffledWord: string | null;
   let word: string;
-  let idx: number;
   do {
-    const wordData = getRandomWord(wordPack, previous);
-    word = wordData.word;
-    idx = wordData.idx;
+    word = getRandomWord(wordPack, previous);
     shuffledWord = shuffleWord(word, bannedWords);
   } while (shuffledWord === null);
-
   return {
     wordScrambled: word,
     wordUnscrambled: shuffledWord,
-    availableWordPack: quickRemove(wordPack, idx),
+    availableWordPack: tryRemoveElement(wordPack.slice(), word),
   };
 }
 
@@ -108,12 +104,11 @@ function shuffleSingleWord(word: string): string {
 function getRandomWord(
   wordPack: readonly string[],
   previous: string = ""
-): { word: string; idx: number } {
+): string {
   let newWord: string;
-  let idx: number;
   do {
-    idx = Math.floor(Math.random() * wordPack.length);
+    const idx = Math.floor(Math.random() * wordPack.length);
     newWord = wordPack[idx];
   } while (newWord === previous);
-  return { word: newWord, idx: idx };
+  return newWord;
 }

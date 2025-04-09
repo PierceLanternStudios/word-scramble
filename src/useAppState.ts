@@ -55,7 +55,6 @@ export type Action =
 
 // the reducer function:
 export function reducer(state: State, action: Action): State {
-  console.log("DISPATCH: ", state, action);
   switch (action.type) {
     // Action: Start game:
     // called whenever the player wants to start the game (after the word pack
@@ -66,8 +65,6 @@ export function reducer(state: State, action: Action): State {
           (word) => !isWordNaughty(word, state.bannedWords!)
         );
         const wordData = getNewWord(cleanWords, state.bannedWords);
-
-        console.log(wordData);
         return {
           phase: "in-game",
           wordUnscrambled: wordData.wordUnscrambled,
@@ -140,12 +137,12 @@ export function getInitialState(): State {
 function generateNewGameState(state: State, wasGuessed: boolean): State {
   if (state.phase !== "in-game") return state;
 
-  console.log("new state made");
   const newWordData = getNewWord(
     state.availableWordPack,
     state.bannedWords,
     state.wordUnscrambled
   );
+
   return {
     phase: "in-game",
     wordUnscrambled: newWordData.wordUnscrambled,
