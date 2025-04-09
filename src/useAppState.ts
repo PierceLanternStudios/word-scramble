@@ -8,13 +8,18 @@ export type WordHistoryItem = {
 };
 
 export type State =
-  | { phase: "pre-game"; wordPack: readonly string[] | null }
+  | {
+      phase: "pre-game";
+      wordPack: readonly string[] | null;
+      bannedWords: readonly string[] | null;
+    }
   | {
       phase: "in-game";
       wordUnscrambled: string;
       wordScrambled: string;
       guess: string;
       wordPack: readonly string[];
+      bannedWords: readonly string[];
       history: {
         words: readonly WordHistoryItem[];
         guesses: number;
@@ -30,10 +35,12 @@ export type State =
         skips: number;
       };
       wordPack: readonly string[];
+      bannedWords: readonly string[];
     };
 
 export type Action =
   | { type: "load-data"; wordPack: readonly string[] }
+  | { type: "load-bans"; bannedWords: readonly string[] }
   | { type: "start-game" }
   | { type: "update-guess"; newGuess: string }
   | { type: "skip-word" }
@@ -50,7 +57,7 @@ export function reducer(state: State, action: Action): State {
     // called whenever the player wants to start the game (after the word pack
     // has been loaded)
     case "start-game":
-      if (state.wordPack !== null) {
+      if (state.wordPack !== null && state.bannedWords !== null) {
         const word = getRandomWord(state.wordPack);
         return {
           phase: "in-game",
@@ -58,6 +65,7 @@ export function reducer(state: State, action: Action): State {
           wordScrambled: shuffleWord(word),
           history: { words: [], skips: 0, guesses: 0 },
           wordPack: state.wordPack,
+          bannedWords: state.bannedWords,
           guess: "",
         };
       }
@@ -68,6 +76,15 @@ export function reducer(state: State, action: Action): State {
     case "load-data": {
       if (state.phase === "pre-game") {
         return { ...state, wordPack: action.wordPack };
+      }
+      break;
+    }
+
+    // Action: Load bans
+    // called when the game has loaded a banned wordpack and can update state.
+    case "load-bans": {
+      if (state.phase === "pre-game") {
+        return { ...state, bannedWords: action.bannedWords };
       }
       break;
     }
@@ -92,6 +109,7 @@ export function reducer(state: State, action: Action): State {
         wordUnscrambled: state.wordUnscrambled,
         history: state.history,
         wordPack: state.wordPack,
+        bannedWords: state.bannedWords,
       };
 
     // called if the player wants to skip a word:
@@ -104,7 +122,7 @@ export function reducer(state: State, action: Action): State {
 
 // generates an initial state with no wordPack
 export function getInitialState(): State {
-  return { phase: "pre-game", wordPack: null };
+  return { phase: "pre-game", wordPack: null, bannedWords: null };
 }
 
 // picks a random word from the word pack. Guarantees that the previous word
@@ -145,5 +163,6 @@ function generateNewGameState(state: State, wasGuessed: boolean): State {
       skips: wasGuessed ? state.history.skips : state.history.skips + 1,
     },
     wordPack: state.wordPack,
+    bannedWords: state.bannedWords,
   };
 }

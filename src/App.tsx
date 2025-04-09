@@ -30,6 +30,19 @@ function App() {
       });
   }, [dispatch]);
 
+  React.useEffect(() => {
+    fetch("https://unpkg.com/naughty-words@1.2.0/en.json").then((response) =>
+      response
+        .json()
+        .then((bannedWords) =>
+          dispatch({
+            type: "load-bans",
+            bannedWords: bannedWords.map(normalizeString).filter(Boolean),
+          })
+        )
+    );
+  }, []);
+
   // switch on game phase to decide what to render:
   switch (state.phase) {
     case "pre-game":
