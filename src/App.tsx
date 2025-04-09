@@ -17,7 +17,7 @@ function App() {
 
   // get word pack:
   React.useEffect(() => {
-    fetch(process.env.PUBLIC_URL + "/animals.txt")
+    fetch(process.env.PUBLIC_URL + "/birds.txt")
       .then((response) => response.text())
       .then((text) => {
         setTimeout(() => {
@@ -27,7 +27,7 @@ function App() {
           });
         }, 1000);
       });
-  }, [dispatch]);
+  }, []);
 
   React.useEffect(() => {
     fetch("https://unpkg.com/naughty-words@1.2.0/en.json").then((response) =>

@@ -1,6 +1,7 @@
 import { normalizeString } from "./Normalization";
 import { getNewWord } from "./Shuffler";
 import { isWordNaughty } from "./IsNaughty";
+import { quickRemove } from "./Utilities";
 
 export type WordHistoryItem = {
   wordUnscrambled: string;
@@ -20,6 +21,7 @@ export type State =
       wordScrambled: string;
       guess: string;
       wordPack: readonly string[];
+      availableWordPack: string[];
       bannedWords: Set<string>;
       history: {
         words: readonly WordHistoryItem[];
@@ -53,21 +55,26 @@ export type Action =
 
 // the reducer function:
 export function reducer(state: State, action: Action): State {
+  console.log("DISPATCH: ", state, action);
   switch (action.type) {
     // Action: Start game:
     // called whenever the player wants to start the game (after the word pack
     // has been loaded)
     case "start-game":
       if (state.wordPack !== null && state.bannedWords !== null) {
-        const wordData = getNewWord(state.wordPack, state.bannedWords);
+        const cleanWords = state.wordPack.filter(
+          (word) => !isWordNaughty(word, state.bannedWords!)
+        );
+        const wordData = getNewWord(cleanWords, state.bannedWords);
+
+        console.log(wordData);
         return {
           phase: "in-game",
           wordUnscrambled: wordData.wordUnscrambled,
           wordScrambled: wordData.wordScrambled,
           history: { words: [], skips: 0, guesses: 0 },
-          wordPack: state.wordPack.filter(
-            (word) => !isWordNaughty(word, state.bannedWords!)
-          ),
+          wordPack: cleanWords,
+          availableWordPack: wordData.availableWordPack,
           bannedWords: state.bannedWords,
           guess: "",
         };
@@ -133,8 +140,9 @@ export function getInitialState(): State {
 function generateNewGameState(state: State, wasGuessed: boolean): State {
   if (state.phase !== "in-game") return state;
 
+  console.log("new state made");
   const newWordData = getNewWord(
-    state.wordPack,
+    state.availableWordPack,
     state.bannedWords,
     state.wordUnscrambled
   );
@@ -156,6 +164,10 @@ function generateNewGameState(state: State, wasGuessed: boolean): State {
       skips: wasGuessed ? state.history.skips : state.history.skips + 1,
     },
     wordPack: state.wordPack,
+    availableWordPack:
+      newWordData.availableWordPack.length === 0
+        ? state.wordPack.slice()
+        : newWordData.availableWordPack,
     bannedWords: state.bannedWords,
   };
 }

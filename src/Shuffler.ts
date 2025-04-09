@@ -1,4 +1,5 @@
 import { isWordNaughty } from "./IsNaughty";
+import { quickRemove } from "./Utilities";
 
 /**
  *  getNewWord
@@ -19,18 +20,29 @@ import { isWordNaughty } from "./IsNaughty";
  *                      new word.
  */
 export function getNewWord(
-  wordPack: readonly string[],
+  wordPack: string[],
   bannedWords: Set<string>,
   previous: string = ""
-): { wordScrambled: string; wordUnscrambled: string } {
+): {
+  wordScrambled: string;
+  wordUnscrambled: string;
+  availableWordPack: string[];
+} {
   let shuffledWord: string | null;
   let word: string;
+  let idx: number;
   do {
-    word = getRandomWord(wordPack, previous);
+    const wordData = getRandomWord(wordPack, previous);
+    word = wordData.word;
+    idx = wordData.idx;
     shuffledWord = shuffleWord(word, bannedWords);
   } while (shuffledWord === null);
 
-  return { wordScrambled: word, wordUnscrambled: shuffledWord };
+  return {
+    wordScrambled: word,
+    wordUnscrambled: shuffledWord,
+    availableWordPack: quickRemove(wordPack, idx),
+  };
 }
 
 /**
@@ -65,23 +77,6 @@ function shuffleWord(word: string, bannedWords: Set<string>): string | null {
 }
 
 /**
- *                arraySwapWithLast
- * @param array   An array of strings in which to perform the swap
- * @param idx     The index with which to swap the last element. If this index is
- *                out of bounds or the array has size < 2, the function will
- *                return the original array.
- * @returns       A new array with the specified index swapped with the last
- *                element, or the original array if the inputs were invalid.
- */
-function arraySwapWithLast(array: string[], idx: number): string[] {
-  if (idx >= array.length || array.length < 2) return array;
-  const temp = array[array.length - 1];
-  array[array.length - 1] = array[idx];
-  array[idx] = temp;
-  return array;
-}
-
-/**
  * shuffleSingleWord
  * @param word A single word to be shuffled. Will return a random ordering of
  *             this word.
@@ -96,8 +91,7 @@ function shuffleSingleWord(word: string): string {
   for (let last = copyWord.length - 1; last >= 0; last--) {
     const idx = Math.floor(Math.random() * copyWord.length);
     result += copyWord[idx];
-    arraySwapWithLast(copyWord, idx);
-    copyWord.pop();
+    quickRemove(copyWord, idx);
   }
   return result;
 }
@@ -114,10 +108,12 @@ function shuffleSingleWord(word: string): string {
 function getRandomWord(
   wordPack: readonly string[],
   previous: string = ""
-): string {
+): { word: string; idx: number } {
   let newWord: string;
+  let idx: number;
   do {
-    newWord = wordPack[Math.floor(Math.random() * wordPack.length)];
+    idx = Math.floor(Math.random() * wordPack.length);
+    newWord = wordPack[idx];
   } while (newWord === previous);
-  return newWord;
+  return { word: newWord, idx: idx };
 }
