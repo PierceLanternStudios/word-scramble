@@ -46,7 +46,7 @@ function App() {
       return (
         <div className={PreGameCSS.container}>
           <h3>Welcome to Word Scramble!</h3>
-          {state.wordPack === null ? (
+          {state.wordPack === null || state.bannedWords === null ? (
             "Loading words..."
           ) : (
             <button
