@@ -11,7 +11,7 @@ export type State =
   | {
       phase: "pre-game";
       wordPack: readonly string[] | null;
-      bannedWords: readonly string[] | null;
+      bannedWords: Set<string> | null;
     }
   | {
       phase: "in-game";
@@ -19,7 +19,7 @@ export type State =
       wordScrambled: string;
       guess: string;
       wordPack: readonly string[];
-      bannedWords: readonly string[];
+      bannedWords: Set<string>;
       history: {
         words: readonly WordHistoryItem[];
         guesses: number;
@@ -35,7 +35,7 @@ export type State =
         skips: number;
       };
       wordPack: readonly string[];
-      bannedWords: readonly string[];
+      bannedWords: Set<string>;
     };
 
 export type Action =
@@ -84,7 +84,7 @@ export function reducer(state: State, action: Action): State {
     // called when the game has loaded a banned wordpack and can update state.
     case "load-bans": {
       if (state.phase === "pre-game") {
-        return { ...state, bannedWords: action.bannedWords };
+        return { ...state, bannedWords: new Set<string>(action.bannedWords) };
       }
       break;
     }
