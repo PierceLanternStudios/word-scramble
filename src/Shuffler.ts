@@ -106,9 +106,11 @@ function getRandomWord(
   previous: string = ""
 ): string {
   let newWord: string;
+  let attempt = 0;
   do {
     const idx = Math.floor(Math.random() * wordPack.length);
     newWord = wordPack[idx];
-  } while (newWord === previous);
+    attempt++;
+  } while (newWord === previous && attempt < 10);
   return newWord;
 }
