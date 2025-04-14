@@ -5,7 +5,8 @@ import { normalizeString } from "./Normalization";
 import InGameCSS from "./InGame.module.css";
 import PreGameCSS from "./PreGame.module.css";
 import ButtonCSS from "./Button.module.css";
-import { pluralize } from "./Utilities";
+import LetterCSS from "./Letters.module.css";
+import { pluralize, quickRemove } from "./Utilities";
 import useLoadData from "./useLoadData";
 import useLoadBans from "./useLoadBans";
 import useAppState from "./useAppState";
@@ -45,8 +46,9 @@ function App() {
     case "in-game":
       return (
         <div className={InGameCSS.container}>
-          <h3>In Game!</h3>
-          <div>Goal: {state.wordScrambled}</div>
+          <h3>Word Scramble!</h3>
+          <div>Unscramble this:</div>
+          <div>{generateDisplayWord(state.wordScrambled, state.guess)}</div>
           <input
             type="text"
             className={InGameCSS.inputField}
@@ -98,6 +100,36 @@ function App() {
         </div>
       );
   }
+}
+
+function generateDisplayWord(word: string, alreadyTyped: string) {
+  const letters = word.split("");
+  let alreadyTypedArray = normalizeString(alreadyTyped).split("");
+  const result: React.ReactNode[] = [];
+  {
+    letters.forEach((elem, idx) => {
+      if (alreadyTypedArray.includes(elem)) {
+        alreadyTypedArray = quickRemove(
+          alreadyTypedArray,
+          alreadyTypedArray.indexOf(elem)
+        );
+        result.push(
+          <span key={idx} className={LetterCSS.highlight}>
+            {elem}
+          </span>
+        );
+      } else {
+        result.push(
+          <span key={idx} className={LetterCSS.normal}>
+            {elem}
+          </span>
+        );
+      }
+    });
+  }
+  return (
+    <div className={LetterCSS.container}>{result.map((elem) => elem)}</div>
+  );
 }
 
 export default App;
