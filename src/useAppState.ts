@@ -1,6 +1,7 @@
 import { normalizeString } from "./Normalization";
-import { getNewWord } from "./Shuffler";
+import { shuffleArray, shuffleWord } from "./Shuffler";
 import { isWordNaughty } from "./IsNaughty";
+import { arrayBuffer } from "stream/consumers";
 
 export type WordHistoryItem = {
   wordUnscrambled: string;
@@ -20,7 +21,8 @@ export type State =
       wordScrambled: string;
       guess: string;
       wordPack: readonly string[];
-      availableWordPack: string[];
+      shuffledWordPack: string[];
+      roundNumber: number;
       bannedWords: ReadonlySet<string>;
       history: {
         words: readonly WordHistoryItem[];
@@ -63,17 +65,15 @@ export function reducer(state: State, action: Action): State {
         const cleanWords = state.wordPack.filter(
           (word) => !isWordNaughty(word, state.bannedWords!)
         );
-        const wordData = getNewWord(cleanWords, state.bannedWords);
+        const shuffledCleanWords = shuffleArray(cleanWords);
         return {
           phase: "in-game",
-          wordUnscrambled: wordData.wordUnscrambled,
-          wordScrambled: wordData.wordScrambled,
+          wordUnscrambled: shuffledCleanWords[0],
+          wordScrambled: shuffleWord(shuffledCleanWords[0], state.bannedWords),
           history: { words: [], skips: 0, guesses: 0 },
           wordPack: cleanWords,
-          availableWordPack:
-            wordData.availableWordPack.length === 0
-              ? state.wordPack.slice()
-              : wordData.availableWordPack,
+          shuffledWordPack: shuffledCleanWords,
+          roundNumber: 0,
           bannedWords: state.bannedWords,
           guess: "",
         };
@@ -142,16 +142,19 @@ export function getInitialState(): State {
 function generateNewGameState(state: State, wasGuessed: boolean): State {
   if (state.phase !== "in-game") return state;
 
-  const newWordData = getNewWord(
-    state.availableWordPack,
-    state.bannedWords,
-    state.wordUnscrambled
-  );
+  const shuffledWordPack =
+    (state.roundNumber + 1) % state.wordPack.length === 0
+      ? shuffleArray(state.shuffledWordPack, state.shuffledWordPack.at(-1))
+      : state.shuffledWordPack;
 
   return {
     phase: "in-game",
-    wordUnscrambled: newWordData.wordUnscrambled,
-    wordScrambled: newWordData.wordScrambled,
+    wordUnscrambled:
+      shuffledWordPack[(state.roundNumber + 1) % state.wordPack.length],
+    wordScrambled: shuffleWord(
+      shuffledWordPack[(state.roundNumber + 1) % state.wordPack.length],
+      state.bannedWords
+    ),
     guess: "",
     history: {
       words: [
@@ -166,10 +169,8 @@ function generateNewGameState(state: State, wasGuessed: boolean): State {
       skips: wasGuessed ? state.history.skips : state.history.skips + 1,
     },
     wordPack: state.wordPack,
-    availableWordPack:
-      newWordData.availableWordPack.length === 0
-        ? state.wordPack.slice()
-        : newWordData.availableWordPack,
+    shuffledWordPack: shuffledWordPack,
+    roundNumber: state.roundNumber + 1,
     bannedWords: state.bannedWords,
   };
 }
