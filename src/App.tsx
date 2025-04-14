@@ -46,6 +46,22 @@ function App() {
       return (
         <div className={InGameCSS.container}>
           <h3>Word Scramble!</h3>
+          <div className={InGameCSS.statsContainer}>
+            <div
+              className={InGameCSS.statHeader}
+              style={{ color: "rgb(92, 92, 92)" }}
+            >
+              <div className={InGameCSS.stat}>Words Guessed:</div>
+              <div className={InGameCSS.stat}>Words Skipped:</div>
+            </div>
+            <div
+              className={InGameCSS.statHeader}
+              style={{ fontSize: "30px", fontWeight: "bolder" }}
+            >
+              <div className={InGameCSS.stat}>{state.history.guesses}</div>
+              <div className={InGameCSS.stat}>{state.history.skips}</div>
+            </div>
+          </div>
           <div>Unscramble this:</div>
           <div>{generateDisplayWord(state.wordScrambled, state.guess)}</div>
           <div className={InGameCSS.inputFieldOverlay}>

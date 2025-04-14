@@ -21,18 +21,40 @@
 .container {
   display: flex;
   flex-direction: column;
-  flex-grow: 0;
   row-gap: 10px;
   width: 800px;
+  height: 100vh;
   margin: 0 auto;
   text-align: center;
   align-items: center;
-  height: 100vh;
-  background-color: rgb(167, 167, 167);
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  background-color: rgb(212, 212, 212);
 }
 
 .rowContainer {
   display: flex;
   flex-direction: row;
+  align-items: center;
   column-gap: 10px;
+}
+
+.statsContainer {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  padding: 10px;
+  border-radius: 5px;
+  color: rgb(41, 41, 41);
+}
+
+.statHeader {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  font-weight: bold;
+}
+
+.stat {
+  flex-grow: 1;
 }

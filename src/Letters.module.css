@@ -8,6 +8,7 @@
   font-weight: bolder;
   padding: 15px;
   border-radius: 10px;
+  transition-duration: 0.1s;
 }
 
 .highlight {
@@ -19,6 +20,7 @@
   font-weight: bolder;
   padding: 15px;
   border-radius: 10px;
+  transition-duration: 0.1s;
 }
 
 .container {
