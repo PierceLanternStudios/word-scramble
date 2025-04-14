@@ -1,7 +1,7 @@
 import { normalizeString } from "./Normalization";
 import { shuffleArray, shuffleWord } from "./Shuffler";
 import { isWordNaughty } from "./IsNaughty";
-import { arrayBuffer } from "stream/consumers";
+import { Dispatch, useReducer } from "react";
 
 export type WordHistoryItem = {
   wordUnscrambled: string;
@@ -53,6 +53,9 @@ export type Action =
 // ######################################################################
 // ==================    State Reducer      =============================
 // ######################################################################
+export default function useAppState(): [State, Dispatch<Action>] {
+  return useReducer(reducer, null, getInitialState);
+}
 
 // the reducer function:
 export function reducer(state: State, action: Action): State {

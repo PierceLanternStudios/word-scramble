@@ -8,13 +8,14 @@ import ButtonCSS from "./Button.module.css";
 import { pluralize } from "./Utilities";
 import useLoadData from "./useLoadData";
 import useLoadBans from "./useLoadBans";
+import useAppState from "./useAppState";
 
 // ######################################################################
 // ==================     App Render     ================================
 // ######################################################################
 
 function App() {
-  const [state, dispatch] = React.useReducer(reducer, null, getInitialState);
+  const [state, dispatch] = useAppState();
   const guessInputRef = React.useRef<HTMLInputElement | null>(null);
 
   //load our word pack data and banned words
