@@ -17,7 +17,7 @@ function App() {
 
   // get word pack:
   React.useEffect(() => {
-    fetch(process.env.PUBLIC_URL + "/birds.txt")
+    fetch(process.env.PUBLIC_URL + "/animals.txt")
       .then((response) => response.text())
       .then((text) => {
         setTimeout(() => {

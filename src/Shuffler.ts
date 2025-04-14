@@ -35,8 +35,8 @@ export function getNewWord(
     shuffledWord = shuffleWord(word, bannedWords);
   } while (shuffledWord === null);
   return {
-    wordScrambled: word,
-    wordUnscrambled: shuffledWord,
+    wordScrambled: shuffledWord,
+    wordUnscrambled: word,
     availableWordPack: tryRemoveElement(wordPack.slice(), word),
   };
 }
@@ -85,11 +85,21 @@ function shuffleWord(
  *            randomize all characters in the input data.
  */
 function shuffleSingleWord(word: string): string {
-  const copyWord: string[] = word.split("");
-  let result: string = "";
+  return shuffleArray(word.split("")).join("");
+}
+
+/**
+ * shuffleArray
+ * @param array   An array of strings to be shuffled
+ * @returns       A new array containing the same elements as the input but
+ *                in a randomly shuffled order.
+ */
+function shuffleArray(array: string[]): string[] {
+  const copyWord: string[] = array.slice();
+  let result: string[] = [];
   for (let last = copyWord.length - 1; last >= 0; last--) {
     const idx = Math.floor(Math.random() * copyWord.length);
-    result += copyWord[idx];
+    result.push(copyWord[idx]);
     quickRemove(copyWord, idx);
   }
   return result;
