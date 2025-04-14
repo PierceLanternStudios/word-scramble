@@ -6,6 +6,8 @@ import InGameCSS from "./InGame.module.css";
 import PreGameCSS from "./PreGame.module.css";
 import ButtonCSS from "./Button.module.css";
 import { pluralize } from "./Utilities";
+import useLoadData from "./useLoadData";
+import useLoadBans from "./useLoadBans";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -15,34 +17,9 @@ function App() {
   const [state, dispatch] = React.useReducer(reducer, null, getInitialState);
   const guessInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  // get word pack:
-  React.useEffect(() => {
-    fetch(process.env.PUBLIC_URL + "/animals.txt")
-      .then((response) => response.text())
-      .then((text) => {
-        setTimeout(() => {
-          dispatch({
-            type: "load-data",
-            wordPack: text
-              .split("\n")
-              .map(normalizeString)
-              .filter(Boolean)
-              .filter((elem, idx, self) => self.indexOf(elem) === idx),
-          });
-        }, 1000);
-      });
-  }, []);
-
-  React.useEffect(() => {
-    fetch("https://unpkg.com/naughty-words@1.2.0/en.json").then((response) =>
-      response.json().then((bannedWords) =>
-        dispatch({
-          type: "load-bans",
-          bannedWords: bannedWords.map(normalizeString).filter(Boolean),
-        })
-      )
-    );
-  }, []);
+  //load our word pack data and banned words
+  useLoadData(dispatch);
+  useLoadBans(dispatch);
 
   // switch on game phase to decide what to render:
   switch (state.phase) {
