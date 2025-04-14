@@ -21,7 +21,7 @@ import { quickRemove, tryRemoveElement } from "./Utilities";
  */
 export function getNewWord(
   wordPack: readonly string[],
-  bannedWords: Set<string>,
+  bannedWords: ReadonlySet<string>,
   previous: string = ""
 ): {
   wordScrambled: string;
@@ -55,7 +55,10 @@ export function getNewWord(
  *              been found after 10 attempts.
  * Effects:     This will preserve the input data.
  */
-function shuffleWord(word: string, bannedWords: Set<string>): string | null {
+function shuffleWord(
+  word: string,
+  bannedWords: ReadonlySet<string>
+): string | null {
   let shuffledWord = word
     .split(/([ -])/)
     .map(shuffleSingleWord)
