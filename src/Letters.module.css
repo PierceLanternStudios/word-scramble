@@ -26,3 +26,16 @@
   flex-direction: row;
   column-gap: 5px;
 }
+
+.guessContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.guessNormal {
+  color: black;
+}
+
+.guessWrong {
+  color: red;
+}
