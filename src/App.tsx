@@ -49,6 +49,9 @@ function App() {
           <div>Unscramble this:</div>
           <div>{generateDisplayWord(state.wordScrambled, state.guess)}</div>
           <div className={InGameCSS.inputFieldOverlay}>
+            <div className={InGameCSS.inputFieldText}>
+              {generateHighlightedGuess(state.guess, state.wordScrambled)}
+            </div>
             <input
               type="text"
               className={InGameCSS.inputField}
@@ -59,9 +62,6 @@ function App() {
                 dispatch({ type: "update-guess", newGuess: ev.target.value })
               }
             />
-            <div className={InGameCSS.inputFieldText}>
-              {generateHighlightedGuess(state.guess, state.wordScrambled)}
-            </div>
           </div>
           <div className={InGameCSS.rowContainer}>
             <button
@@ -138,8 +138,8 @@ function generateDisplayWord(word: string, alreadyTyped: string) {
 
 // function to generate the highlighted text for the guess field
 function generateHighlightedGuess(currentGuess: string, word: string) {
-  const guess = normalizeString(currentGuess).split("");
-  let wordArray = normalizeString(word).split("");
+  const guess = currentGuess.toUpperCase().split("");
+  let wordArray = word.toUpperCase().split("");
   const result: React.ReactNode[] = [];
   {
     guess.forEach((elem, idx) => {
@@ -160,7 +160,9 @@ function generateHighlightedGuess(currentGuess: string, word: string) {
     });
   }
   return (
-    <div className={LetterCSS.guessContainer}>{result.map((elem) => elem)}</div>
+    <div className={LetterCSS.guessContainer}>
+      {result.slice(-20).map((elem) => elem)}
+    </div>
   );
 }
 
