@@ -19,7 +19,8 @@ function App() {
   const guessInputRef = React.useRef<HTMLInputElement | null>(null);
 
   //load our word pack data and banned words
-  useLoadData(dispatch);
+  useLoadData(dispatch, "animals");
+  useLoadData(dispatch, "birds");
   useLoadBans(dispatch);
 
   // switch on game phase to decide what to render:
@@ -39,6 +40,18 @@ function App() {
               Start Game!
             </button>
           )}
+          <div>Word pack to use:</div>
+          <div>
+            {Object.keys(state.availableWordPacks).map((name, pack) => (
+              <button
+                onClick={() =>
+                  dispatch({ type: "select-pack", wordPackName: name })
+                }
+              >
+                {name}
+              </button>
+            ))}
+          </div>
         </div>
       );
 
