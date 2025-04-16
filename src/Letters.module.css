@@ -1,0 +1,41 @@
+.normal {
+  background-color: rgb(14, 78, 73);
+  color: rgb(255, 249, 241);
+  text-shadow: 0px 0px 3px rgb(255, 249, 241);
+  font-size: large;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-weight: bolder;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.highlight {
+  background-color: rgb(12, 68, 63);
+  color: rgb(109, 107, 103);
+  font-size: large;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-weight: bolder;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  column-gap: 5px;
+}
+
+.guessContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.guessNormal {
+  color: black;
+}
+
+.guessWrong {
+  color: red;
+}

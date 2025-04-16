@@ -8,7 +8,7 @@
  */
 export function isWordNaughty(
   shuffledWord: string,
-  bannedWords: Set<string>
+  bannedWords: ReadonlySet<string>
 ): boolean {
   return (
     shuffledWord

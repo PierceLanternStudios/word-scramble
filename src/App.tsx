@@ -1,48 +1,26 @@
 import React from "react";
 import "./App.css";
-import { reducer, getInitialState } from "./useAppState";
 import { normalizeString } from "./Normalization";
 import InGameCSS from "./InGame.module.css";
 import PreGameCSS from "./PreGame.module.css";
 import ButtonCSS from "./Button.module.css";
-import { pluralize } from "./Utilities";
+import LetterCSS from "./Letters.module.css";
+import { pluralize, quickRemove } from "./Utilities";
+import useLoadData from "./useLoadData";
+import useLoadBans from "./useLoadBans";
+import useAppState from "./useAppState";
 
 // ######################################################################
 // ==================     App Render     ================================
 // ######################################################################
 
 function App() {
-  const [state, dispatch] = React.useReducer(reducer, null, getInitialState);
+  const [state, dispatch] = useAppState();
   const guessInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  // get word pack:
-  React.useEffect(() => {
-    fetch(process.env.PUBLIC_URL + "/birds.txt")
-      .then((response) => response.text())
-      .then((text) => {
-        setTimeout(() => {
-          dispatch({
-            type: "load-data",
-            wordPack: text
-              .split("\n")
-              .map(normalizeString)
-              .filter(Boolean)
-              .filter((elem, idx, self) => self.indexOf(elem) === idx),
-          });
-        }, 1000);
-      });
-  }, []);
-
-  React.useEffect(() => {
-    fetch("https://unpkg.com/naughty-words@1.2.0/en.json").then((response) =>
-      response.json().then((bannedWords) =>
-        dispatch({
-          type: "load-bans",
-          bannedWords: bannedWords.map(normalizeString).filter(Boolean),
-        })
-      )
-    );
-  }, []);
+  //load our word pack data and banned words
+  useLoadData(dispatch);
+  useLoadBans(dispatch);
 
   // switch on game phase to decide what to render:
   switch (state.phase) {
@@ -67,18 +45,24 @@ function App() {
     case "in-game":
       return (
         <div className={InGameCSS.container}>
-          <h3>In Game!</h3>
-          <div>Goal: {state.wordScrambled}</div>
-          <input
-            type="text"
-            className={InGameCSS.inputField}
-            autoFocus
-            ref={guessInputRef}
-            value={state.guess}
-            onChange={(ev) =>
-              dispatch({ type: "update-guess", newGuess: ev.target.value })
-            }
-          />
+          <h3>Word Scramble!</h3>
+          <div>Unscramble this:</div>
+          <div>{generateDisplayWord(state.wordScrambled, state.guess)}</div>
+          <div className={InGameCSS.inputFieldOverlay}>
+            <input
+              type="text"
+              className={InGameCSS.inputField}
+              autoFocus
+              ref={guessInputRef}
+              value={state.guess}
+              onChange={(ev) =>
+                dispatch({ type: "update-guess", newGuess: ev.target.value })
+              }
+            />
+            <div className={InGameCSS.inputFieldText}>
+              {generateHighlightedGuess(state.guess, state.wordScrambled)}
+            </div>
+          </div>
           <div className={InGameCSS.rowContainer}>
             <button
               className={ButtonCSS.button}
@@ -120,6 +104,64 @@ function App() {
         </div>
       );
   }
+}
+
+function generateDisplayWord(word: string, alreadyTyped: string) {
+  const letters = normalizeString(word).split("");
+  let alreadyTypedArray = normalizeString(alreadyTyped).split("");
+  const result: React.ReactNode[] = [];
+  {
+    letters.forEach((elem, idx) => {
+      if (alreadyTypedArray.includes(elem)) {
+        alreadyTypedArray = quickRemove(
+          alreadyTypedArray,
+          alreadyTypedArray.indexOf(elem)
+        );
+        result.push(
+          <span key={idx} className={LetterCSS.highlight}>
+            {elem}
+          </span>
+        );
+      } else {
+        result.push(
+          <span key={idx} className={LetterCSS.normal}>
+            {elem}
+          </span>
+        );
+      }
+    });
+  }
+  return (
+    <div className={LetterCSS.container}>{result.map((elem) => elem)}</div>
+  );
+}
+
+// function to generate the highlighted text for the guess field
+function generateHighlightedGuess(currentGuess: string, word: string) {
+  const guess = normalizeString(currentGuess).split("");
+  let wordArray = normalizeString(word).split("");
+  const result: React.ReactNode[] = [];
+  {
+    guess.forEach((elem, idx) => {
+      if (wordArray.includes(elem)) {
+        wordArray = quickRemove(wordArray, wordArray.indexOf(elem));
+        result.push(
+          <span key={idx} className={LetterCSS.guessNormal}>
+            {elem}
+          </span>
+        );
+      } else {
+        result.push(
+          <span key={idx} className={LetterCSS.guessWrong}>
+            {elem}
+          </span>
+        );
+      }
+    });
+  }
+  return (
+    <div className={LetterCSS.guessContainer}>{result.map((elem) => elem)}</div>
+  );
 }
 
 export default App;

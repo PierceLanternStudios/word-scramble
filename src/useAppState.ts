@@ -1,6 +1,7 @@
 import { normalizeString } from "./Normalization";
-import { getNewWord } from "./Shuffler";
+import { shuffleArray, shuffleWord } from "./Shuffler";
 import { isWordNaughty } from "./IsNaughty";
+import { Dispatch, useReducer } from "react";
 
 export type WordHistoryItem = {
   wordUnscrambled: string;
@@ -12,7 +13,7 @@ export type State =
   | {
       phase: "pre-game";
       wordPack: readonly string[] | null;
-      bannedWords: Set<string> | null;
+      bannedWords: ReadonlySet<string> | null;
     }
   | {
       phase: "in-game";
@@ -20,8 +21,9 @@ export type State =
       wordScrambled: string;
       guess: string;
       wordPack: readonly string[];
-      availableWordPack: string[];
-      bannedWords: Set<string>;
+      shuffledWordPack: string[];
+      roundNumber: number;
+      bannedWords: ReadonlySet<string>;
       history: {
         words: readonly WordHistoryItem[];
         guesses: number;
@@ -37,7 +39,7 @@ export type State =
         skips: number;
       };
       wordPack: readonly string[];
-      bannedWords: Set<string>;
+      bannedWords: ReadonlySet<string>;
     };
 
 export type Action =
@@ -51,6 +53,9 @@ export type Action =
 // ######################################################################
 // ==================    State Reducer      =============================
 // ######################################################################
+export default function useAppState(): [State, Dispatch<Action>] {
+  return useReducer(reducer, null, getInitialState);
+}
 
 // the reducer function:
 export function reducer(state: State, action: Action): State {
@@ -63,17 +68,15 @@ export function reducer(state: State, action: Action): State {
         const cleanWords = state.wordPack.filter(
           (word) => !isWordNaughty(word, state.bannedWords!)
         );
-        const wordData = getNewWord(cleanWords, state.bannedWords);
+        const shuffledCleanWords = shuffleArray(cleanWords);
         return {
           phase: "in-game",
-          wordUnscrambled: wordData.wordUnscrambled,
-          wordScrambled: wordData.wordScrambled,
+          wordUnscrambled: shuffledCleanWords[0],
+          wordScrambled: shuffleWord(shuffledCleanWords[0], state.bannedWords),
           history: { words: [], skips: 0, guesses: 0 },
           wordPack: cleanWords,
-          availableWordPack:
-            wordData.availableWordPack.length === 0
-              ? state.wordPack.slice()
-              : wordData.availableWordPack,
+          shuffledWordPack: shuffledCleanWords,
+          roundNumber: 0,
           bannedWords: state.bannedWords,
           guess: "",
         };
@@ -93,7 +96,10 @@ export function reducer(state: State, action: Action): State {
     // called when the game has loaded a banned wordpack and can update state.
     case "load-bans": {
       if (state.phase === "pre-game") {
-        return { ...state, bannedWords: new Set<string>(action.bannedWords) };
+        return {
+          ...state,
+          bannedWords: new Set<string>(action.bannedWords),
+        };
       }
       break;
     }
@@ -139,16 +145,19 @@ export function getInitialState(): State {
 function generateNewGameState(state: State, wasGuessed: boolean): State {
   if (state.phase !== "in-game") return state;
 
-  const newWordData = getNewWord(
-    state.availableWordPack,
-    state.bannedWords,
-    state.wordUnscrambled
-  );
+  const shuffledWordPack =
+    (state.roundNumber + 1) % state.wordPack.length === 0
+      ? shuffleArray(state.shuffledWordPack, state.shuffledWordPack.at(-1))
+      : state.shuffledWordPack;
 
   return {
     phase: "in-game",
-    wordUnscrambled: newWordData.wordUnscrambled,
-    wordScrambled: newWordData.wordScrambled,
+    wordUnscrambled:
+      shuffledWordPack[(state.roundNumber + 1) % state.wordPack.length],
+    wordScrambled: shuffleWord(
+      shuffledWordPack[(state.roundNumber + 1) % state.wordPack.length],
+      state.bannedWords
+    ),
     guess: "",
     history: {
       words: [
@@ -163,10 +172,8 @@ function generateNewGameState(state: State, wasGuessed: boolean): State {
       skips: wasGuessed ? state.history.skips : state.history.skips + 1,
     },
     wordPack: state.wordPack,
-    availableWordPack:
-      newWordData.availableWordPack.length === 0
-        ? state.wordPack.slice()
-        : newWordData.availableWordPack,
+    shuffledWordPack: shuffledWordPack,
+    roundNumber: state.roundNumber + 1,
     bannedWords: state.bannedWords,
   };
 }
