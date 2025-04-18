@@ -15,7 +15,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    if: github.repository == 'piercelanternstudios/react-word-scramble'
+    if: github.repository == 'piercelanternstudios/word-scramble'
 
     environment:
       name: build-and-deploy
