@@ -120,6 +120,24 @@ function App() {
               Start a new Game!
             </button>
           </div>
+          <strong>Word pack to use:</strong>
+          <div className={InGameCSS.rowContainer}>
+            {Object.keys(state.availableWordPacks).map((name, pack) => (
+              <button
+                className={ButtonCSS.smallButton}
+                onClick={() =>
+                  dispatch({ type: "select-pack", wordPackName: name })
+                }
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+          <div>
+            {state.wordPackName === null
+              ? ""
+              : "Currently Using Wordpack: " + state.wordPackName}
+          </div>
         </div>
       );
   }
