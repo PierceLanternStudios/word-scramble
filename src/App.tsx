@@ -9,6 +9,7 @@ import { pluralize, quickRemove } from "./Utilities";
 import useLoadData from "./useLoadData";
 import useLoadBans from "./useLoadBans";
 import useAppState from "./useAppState";
+import { WORDPACKS } from "./WordPacks";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -19,8 +20,7 @@ function App() {
   const guessInputRef = React.useRef<HTMLInputElement | null>(null);
 
   //load our word pack data and banned words
-  useLoadData(dispatch, "animals");
-  useLoadData(dispatch, "birds");
+  useLoadData(dispatch);
   useLoadBans(dispatch);
 
   // switch on game phase to decide what to render:
@@ -30,7 +30,7 @@ function App() {
         <div className={PreGameCSS.container}>
           <h3>Welcome to Word Scramble!</h3>
           {state.wordPack === null || state.bannedWords === null ? (
-            "Loading words..."
+            <i>Loading words...</i>
           ) : (
             <button
               autoFocus
@@ -40,10 +40,11 @@ function App() {
               Start Game!
             </button>
           )}
-          <div>Word pack to use:</div>
-          <div>
+          <strong>Word pack to use:</strong>
+          <div className={InGameCSS.rowContainer}>
             {Object.keys(state.availableWordPacks).map((name, pack) => (
               <button
+                className={ButtonCSS.smallButton}
                 onClick={() =>
                   dispatch({ type: "select-pack", wordPackName: name })
                 }
@@ -51,6 +52,11 @@ function App() {
                 {name}
               </button>
             ))}
+          </div>
+          <div>
+            {state.wordPackName === null
+              ? ""
+              : "Currently Using Wordpack: " + state.wordPackName}
           </div>
         </div>
       );
