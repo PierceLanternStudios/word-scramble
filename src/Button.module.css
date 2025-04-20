@@ -1,6 +1,16 @@
 .button {
   padding: 15px 10px;
-  background-color: rgb(197, 197, 197);
+  background-color: rgb(221, 221, 221);
+  border-radius: 5px;
+  border: 1px;
+  border-style: solid;
+  border-color: rgb(117, 117, 117);
+  transition-duration: 0.25s;
+}
+
+.smallButton {
+  padding: 7px 4px;
+  background-color: rgb(221, 221, 221);
   border-radius: 5px;
   border: 1px;
   border-style: solid;
@@ -11,4 +21,5 @@
 .button:hover,
 button:focus {
   scale: 1.1;
+  background-color: rgb(125, 175, 150);
 }

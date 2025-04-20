@@ -33,9 +33,11 @@
 }
 
 .guessNormal {
-  color: black;
+  color: rgb(15, 68, 61);
+  white-space: pre;
 }
 
 .guessWrong {
-  color: red;
+  color: rgb(255, 0, 0);
+  white-space: pre;
 }
