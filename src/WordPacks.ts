@@ -11,4 +11,5 @@
 export const WORDPACKS = {
   ["Animals"]: "/animals.txt",
   ["Birds"]: "/birds.txt",
+  ["Bacteria"]: "/bacteria.txt",
 };
