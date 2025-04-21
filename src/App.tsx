@@ -157,6 +157,11 @@ function App() {
               ? ""
               : "Currently Using Wordpack: " + state.wordPackName}
           </div>
+
+          <div>
+            <h4>Previous Game Stats:</h4>
+            {generateStats(state)}
+          </div>
         </div>
       );
   }
