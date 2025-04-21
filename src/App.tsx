@@ -8,7 +8,8 @@ import LetterCSS from "./Letters.module.css";
 import { pluralize, quickRemove } from "./Utilities";
 import useLoadData from "./useLoadData";
 import useLoadBans from "./useLoadBans";
-import useAppState from "./useAppState";
+import useAppState, { State } from "./useAppState";
+import { workerData } from "worker_threads";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -116,6 +117,7 @@ function App() {
               Skip this word
             </button>
           </div>
+          {generateStats(state)}
         </div>
       );
     case "post-game":
@@ -216,6 +218,38 @@ function generateHighlightedGuess(currentGuess: string, word: string) {
   return (
     <div className={LetterCSS.guessContainer}>
       {result.slice(-20).map((elem) => elem)}
+    </div>
+  );
+}
+
+// function to generate the stat array for displaying
+function generateStats(state: State) {
+  if (state.phase === "pre-game") {
+    return null;
+  }
+
+  return state.history.words.length === 0 ? null : (
+    <div className={InGameCSS.statsContainer}>
+      <div style={{ textAlign: "left" }}>
+        <ul className={LetterCSS.basicList}>
+          <li>
+            <strong>Word:</strong>
+          </li>
+          {state.history.words.map((word) => (
+            <li>{word.wordUnscrambled}</li>
+          ))}
+        </ul>
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <ul className={LetterCSS.basicList}>
+          <li>
+            <strong>Result:</strong>
+          </li>
+          {state.history.words.map((word) => (
+            <li>{word.result}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

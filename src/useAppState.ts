@@ -6,7 +6,7 @@ import { Dispatch, useReducer } from "react";
 export type WordHistoryItem = {
   wordUnscrambled: string;
   wordScrambled: string;
-  result: "guessed" | "skipped";
+  result: "Guessed" | "Skipped";
 };
 
 export type State =
@@ -207,7 +207,7 @@ function generateNewGameState(state: State, wasGuessed: boolean): State {
         {
           wordUnscrambled: state.wordUnscrambled,
           wordScrambled: state.wordScrambled,
-          result: "skipped",
+          result: wasGuessed ? "Guessed" : "Skipped",
         },
       ],
       guesses: wasGuessed ? state.history.guesses + 1 : state.history.guesses,
