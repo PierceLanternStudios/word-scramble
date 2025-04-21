@@ -9,6 +9,7 @@ import { pluralize, quickRemove } from "./Utilities";
 import useLoadData from "./useLoadData";
 import useLoadBans from "./useLoadBans";
 import useAppState from "./useAppState";
+import { WORDPACKS } from "./WordPacks";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -29,7 +30,7 @@ function App() {
         <div className={PreGameCSS.container}>
           <h3>Welcome to Word Scramble!</h3>
           {state.wordPack === null || state.bannedWords === null ? (
-            "Loading words..."
+            <i>Loading words...</i>
           ) : (
             <button
               autoFocus
@@ -39,6 +40,24 @@ function App() {
               Start Game!
             </button>
           )}
+          <strong>Word pack to use:</strong>
+          <div className={InGameCSS.rowContainer}>
+            {Object.keys(state.availableWordPacks).map((name, pack) => (
+              <button
+                className={ButtonCSS.smallButton}
+                onClick={() =>
+                  dispatch({ type: "select-pack", wordPackName: name })
+                }
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+          <div>
+            {state.wordPackName === null
+              ? ""
+              : "Currently Using Wordpack: " + state.wordPackName}
+          </div>
         </div>
       );
 
@@ -49,6 +68,9 @@ function App() {
           <div>Unscramble this:</div>
           <div>{generateDisplayWord(state.wordScrambled, state.guess)}</div>
           <div className={InGameCSS.inputFieldOverlay}>
+            <div className={InGameCSS.inputFieldText}>
+              {generateHighlightedGuess(state.guess, state.wordScrambled)}
+            </div>
             <input
               type="text"
               className={InGameCSS.inputField}
@@ -59,9 +81,6 @@ function App() {
                 dispatch({ type: "update-guess", newGuess: ev.target.value })
               }
             />
-            <div className={InGameCSS.inputFieldText}>
-              {generateHighlightedGuess(state.guess, state.wordScrambled)}
-            </div>
           </div>
           <div className={InGameCSS.rowContainer}>
             <button
@@ -101,6 +120,24 @@ function App() {
               Start a new Game!
             </button>
           </div>
+          <strong>Word pack to use:</strong>
+          <div className={InGameCSS.rowContainer}>
+            {Object.keys(state.availableWordPacks).map((name, pack) => (
+              <button
+                className={ButtonCSS.smallButton}
+                onClick={() =>
+                  dispatch({ type: "select-pack", wordPackName: name })
+                }
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+          <div>
+            {state.wordPackName === null
+              ? ""
+              : "Currently Using Wordpack: " + state.wordPackName}
+          </div>
         </div>
       );
   }
@@ -138,8 +175,8 @@ function generateDisplayWord(word: string, alreadyTyped: string) {
 
 // function to generate the highlighted text for the guess field
 function generateHighlightedGuess(currentGuess: string, word: string) {
-  const guess = normalizeString(currentGuess).split("");
-  let wordArray = normalizeString(word).split("");
+  const guess = currentGuess.toUpperCase().split("");
+  let wordArray = word.toUpperCase().split("");
   const result: React.ReactNode[] = [];
   {
     guess.forEach((elem, idx) => {
@@ -160,7 +197,9 @@ function generateHighlightedGuess(currentGuess: string, word: string) {
     });
   }
   return (
-    <div className={LetterCSS.guessContainer}>{result.map((elem) => elem)}</div>
+    <div className={LetterCSS.guessContainer}>
+      {result.slice(-20).map((elem) => elem)}
+    </div>
   );
 }
 

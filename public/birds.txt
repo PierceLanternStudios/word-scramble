@@ -1,2 +1,10 @@
-a
-b
+coopers-hawk
+peregrine-falcon
+bald-eagle
+wood-thrush
+robin
+bluejay
+osprey
+dove
+penguin
+barn-swallow

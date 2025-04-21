@@ -1,21 +1,41 @@
+.inputFieldOverlay {
+  position: relative;
+  width: 200px;
+  height: 50px;
+  right: 15px;
+  align-self: center;
+  align-items: center;
+}
+
 .inputField {
-  grid-column: 1;
-  grid-row: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
   text-transform: uppercase;
   padding: 10px 12px;
   border: none /*1px solid rgb(129, 129, 129)*/;
   border-bottom: 2px solid rgb(82, 170, 253);
-  background-color: rgb(216, 216, 216);
+  color: transparent;
+  letter-spacing: 1px;
+  caret-color: black;
+  background-color: transparent;
+  font-size: large;
+  font-weight: bold;
+  font-family: monospace;
 }
 
-.inputFieldOverlay {
-  display: grid;
-}
 .inputFieldText {
-  grid-column: 1;
-  grid-row: 2;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
   text-transform: uppercase;
   padding: 10px 12px;
+  letter-spacing: 1px;
+  font-size: large;
+  font-weight: bold;
+  font-family: monospace;
 }
 
 .container {

@@ -4,5 +4,6 @@
   flex-direction: column;
   vertical-align: center;
   justify-content: center;
+  row-gap: 10px;
   height: 100vh;
 }
