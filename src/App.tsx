@@ -9,7 +9,6 @@ import { pluralize, quickRemove } from "./Utilities";
 import useLoadData from "./useLoadData";
 import useLoadBans from "./useLoadBans";
 import useAppState, { State } from "./useAppState";
-import { workerData } from "worker_threads";
 
 // ######################################################################
 // ==================     App Render     ================================
