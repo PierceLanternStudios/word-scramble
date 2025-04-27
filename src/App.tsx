@@ -8,8 +8,7 @@ import LetterCSS from "./Letters.module.css";
 import { pluralize, quickRemove } from "./Utilities";
 import useLoadData from "./useLoadData";
 import useLoadBans from "./useLoadBans";
-import useAppState from "./useAppState";
-import { WORDPACKS } from "./WordPacks";
+import useAppState, { State } from "./useAppState";
 
 // ######################################################################
 // ==================     App Render     ================================
@@ -22,6 +21,30 @@ function App() {
   //load our word pack data and banned words
   useLoadData(dispatch);
   useLoadBans(dispatch);
+
+  // function to perform all the actions required to skip a word:
+  const skipWord = React.useCallback(() => {
+    dispatch({ type: "skip-word" });
+    guessInputRef.current?.focus();
+  }, [dispatch]);
+
+  // add event listener for keyboard presses:
+  React.useEffect(() => {
+    const abortController = new AbortController();
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          skipWord();
+        }
+      },
+      { signal: abortController.signal }
+    );
+    return () => {
+      document.removeEventListener("keydown", abortController.abort);
+    };
+  }, [skipWord]);
 
   // switch on game phase to decide what to render:
   switch (state.phase) {
@@ -89,16 +112,11 @@ function App() {
             >
               End Game
             </button>
-            <button
-              className={ButtonCSS.button}
-              onClick={() => {
-                dispatch({ type: "skip-word" });
-                guessInputRef.current?.focus();
-              }}
-            >
+            <button className={ButtonCSS.button} onClick={skipWord}>
               Skip this word
             </button>
           </div>
+          {generateStats(state)}
         </div>
       );
     case "post-game":
@@ -138,6 +156,11 @@ function App() {
               ? ""
               : "Currently Using Wordpack: " + state.wordPackName}
           </div>
+
+          <div>
+            <h4>Previous Game Stats:</h4>
+            {generateStats(state)}
+          </div>
         </div>
       );
   }
@@ -147,27 +170,27 @@ function generateDisplayWord(word: string, alreadyTyped: string) {
   const letters = normalizeString(word).split("");
   let alreadyTypedArray = normalizeString(alreadyTyped).split("");
   const result: React.ReactNode[] = [];
-  {
-    letters.forEach((elem, idx) => {
-      if (alreadyTypedArray.includes(elem)) {
-        alreadyTypedArray = quickRemove(
-          alreadyTypedArray,
-          alreadyTypedArray.indexOf(elem)
-        );
-        result.push(
-          <span key={idx} className={LetterCSS.highlight}>
-            {elem}
-          </span>
-        );
-      } else {
-        result.push(
-          <span key={idx} className={LetterCSS.normal}>
-            {elem}
-          </span>
-        );
-      }
-    });
-  }
+
+  letters.forEach((elem, idx) => {
+    if (alreadyTypedArray.includes(elem)) {
+      alreadyTypedArray = quickRemove(
+        alreadyTypedArray,
+        alreadyTypedArray.indexOf(elem)
+      );
+      result.push(
+        <span key={idx} className={LetterCSS.highlight}>
+          {elem}
+        </span>
+      );
+    } else {
+      result.push(
+        <span key={idx} className={LetterCSS.normal}>
+          {elem}
+        </span>
+      );
+    }
+  });
+
   return (
     <div className={LetterCSS.container}>{result.map((elem) => elem)}</div>
   );
@@ -178,27 +201,59 @@ function generateHighlightedGuess(currentGuess: string, word: string) {
   const guess = currentGuess.toUpperCase().split("");
   let wordArray = word.toUpperCase().split("");
   const result: React.ReactNode[] = [];
-  {
-    guess.forEach((elem, idx) => {
-      if (wordArray.includes(elem)) {
-        wordArray = quickRemove(wordArray, wordArray.indexOf(elem));
-        result.push(
-          <span key={idx} className={LetterCSS.guessNormal}>
-            {elem}
-          </span>
-        );
-      } else {
-        result.push(
-          <span key={idx} className={LetterCSS.guessWrong}>
-            {elem}
-          </span>
-        );
-      }
-    });
-  }
+
+  guess.forEach((elem, idx) => {
+    if (wordArray.includes(elem)) {
+      wordArray = quickRemove(wordArray, wordArray.indexOf(elem));
+      result.push(
+        <span key={idx} className={LetterCSS.guessNormal}>
+          {elem}
+        </span>
+      );
+    } else {
+      result.push(
+        <span key={idx} className={LetterCSS.guessWrong}>
+          {elem}
+        </span>
+      );
+    }
+  });
+
   return (
     <div className={LetterCSS.guessContainer}>
       {result.slice(-20).map((elem) => elem)}
+    </div>
+  );
+}
+
+// function to generate the stat array for displaying
+function generateStats(state: State) {
+  if (state.phase === "pre-game") {
+    return null;
+  }
+
+  return state.history.words.length === 0 ? null : (
+    <div className={InGameCSS.statsContainer}>
+      <div style={{ textAlign: "left" }}>
+        <ul className={LetterCSS.basicList}>
+          <li>
+            <strong>Word:</strong>
+          </li>
+          {state.history.words.map((word) => (
+            <li>{word.wordUnscrambled}</li>
+          ))}
+        </ul>
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <ul className={LetterCSS.basicList}>
+          <li>
+            <strong>Result:</strong>
+          </li>
+          {state.history.words.map((word) => (
+            <li>{word.result}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

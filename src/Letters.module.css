@@ -41,3 +41,9 @@
   color: rgb(255, 0, 0);
   white-space: pre;
 }
+
+.basicList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}

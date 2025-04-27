@@ -56,3 +56,16 @@
   flex-direction: row;
   column-gap: 10px;
 }
+
+.statsContainer {
+  display: flex;
+  flex-direction: row;
+  column-gap: 50px;
+  border-style: outset;
+  border-color: rgb(12, 68, 63);
+  background-color: rgb(134, 134, 134);
+  border-width: 2px;
+  padding: 5px 20px;
+  border-radius: 5px;
+  color: rgb(0, 0, 0);
+}
