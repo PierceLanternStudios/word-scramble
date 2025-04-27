@@ -5,7 +5,7 @@ import { WORDPACKS } from "./WordPacks";
 
 export default function useLoadData(dispatch: Dispatch<Action>): void {
   useEffect(() => {
-    Object.entries(WORDPACKS).map(([name, path]) => {
+    Object.entries(WORDPACKS).forEach(([name, path]) => {
       fetch(process.env.PUBLIC_URL + path)
         .then((response) => response.text())
         .then((text) => {
