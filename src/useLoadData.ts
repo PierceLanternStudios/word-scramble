@@ -19,7 +19,7 @@ export default function useLoadData(dispatch: Dispatch<Action>): void {
                 .filter(Boolean)
                 .filter((elem, idx, self) => self.indexOf(elem) === idx),
             });
-          }, 1000);
+          }, 300);
         });
     });
   }, [dispatch]);

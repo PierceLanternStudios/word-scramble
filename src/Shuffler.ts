@@ -1,5 +1,5 @@
 import { isWordNaughty } from "./IsNaughty";
-import { quickRemove, tryRemoveElement } from "./Utilities";
+import { quickRemove } from "./Utilities";
 
 /**
  * Name:        shuffleWord
